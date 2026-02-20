@@ -1,11 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Platform } from "react-native";
-
-// 10.0.2.2 maps to host localhost on Android emulator; web uses localhost directly
-const BASE_URL = Platform.OS === "android"
-  ? "http://10.0.2.2:8000"
-  : "http://localhost:8000";
+// Point mobile app to remote backend
+const BASE_URL = "http://65.2.140.123:8000";
 
 const client = axios.create({
   baseURL: BASE_URL,
