@@ -34,48 +34,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
+        console.log("[AuthContext] Loading stored token...");
         const stored = await AsyncStorage.getItem("token");
         if (stored) {
+          console.log("[AuthContext] Token found, setting token");
           setToken(stored);
           // Check if user has a birth profile
           try {
+            console.log("[AuthContext] Fetching birth profile...");
             await getBirthProfile();
+            console.log("[AuthContext] Birth profile found, hasProfile = true");
             setHasProfile(true);
-          } catch {
+          } catch (err) {
+            console.log("[AuthContext] Birth profile not found or error:", err);
+            console.error("[AuthContext] Birth profile error:", err);
             setHasProfile(false);
           }
+        } else {
+          console.log("[AuthContext] No stored token found");
         }
+      } catch (err) {
+        console.log("[AuthContext] Error loading stored token:", err);
+        console.error("[AuthContext] Error loading stored token:", err);
       } finally {
+        console.log("[AuthContext] Loading complete");
         setLoading(false);
       }
     })();
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { access_token } = await api.login(email, password);
-    await AsyncStorage.setItem("token", access_token);
-    setToken(access_token);
-
     try {
-      await getBirthProfile();
-      setHasProfile(true);
-    } catch {
-      setHasProfile(false);
+      console.log("[AuthContext] Login attempt for:", email);
+      const { access_token } = await api.login(email, password);
+      console.log("[AuthContext] Login API response received, token:", access_token);
+      await AsyncStorage.setItem("token", access_token);
+      console.log("[AuthContext] Token stored in AsyncStorage");
+      setToken(access_token);
+      console.log("[AuthContext] Login successful for:", email);
+
+      try {
+        console.log("[AuthContext] Fetching birth profile after login...");
+        await getBirthProfile();
+        console.log("[AuthContext] Birth profile fetched successfully");
+        setHasProfile(true);
+      } catch (profileError) {
+        console.log("[AuthContext] Failed to fetch birth profile after login:", profileError);
+        console.error("[AuthContext] Failed to fetch birth profile after login:", profileError);
+        setHasProfile(false);
+      }
+    } catch (error) {
+      console.log("[AuthContext] Login failed:", error);
+      console.error("[AuthContext] Login failed:", error);
+      throw error;
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
-    const { access_token } = await api.register(email, password, name);
-    await AsyncStorage.setItem("token", access_token);
-    setToken(access_token);
-    setHasProfile(false);
-  };
+    try {
+      console.log("[AuthContext] Register attempt for:", email, "name:", name);
+      const { access_token } = await api.register(email, password, name);
+      console.log("[AuthContext] Register API response received, token:", access_token);
+      await AsyncStorage.setItem("token", access_token);
+      console.log("[AuthContext] Token stored in AsyncStorage");
+      setToken(access_token);
+      console.log("[AuthContext] Register successful for:", email);
+      setHasProfile(false);
+      } catch (error) {
+        console.log("[AuthContext] Register failed:", error);
+        console.error("[AuthContext] Register failed:", error);
+        throw error;
+      }
+    };
 
-  const logout = async () => {
-    await AsyncStorage.removeItem("token");
-    setToken(null);
-    setHasProfile(false);
-  };
+    const logout = async () => {
+      console.log("[AuthContext] Logout started");
+      await AsyncStorage.removeItem("token");
+      console.log("[AuthContext] Token removed from AsyncStorage");
+      setToken(null);
+      setHasProfile(false);
+      console.log("[AuthContext] Logout complete");
+    };
 
   return (
     <AuthContext.Provider
