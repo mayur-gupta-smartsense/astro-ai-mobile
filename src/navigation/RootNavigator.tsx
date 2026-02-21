@@ -1,17 +1,12 @@
 import React from "react";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
-import { createStackNavigator } from "@react-navigation/stack";
 import { useAuth } from "../context/AuthContext";
 import AuthNavigator from "./AuthNavigator";
 import AppNavigator from "./AppNavigator";
-import BirthProfileInputScreen from "../screens/BirthProfileInputScreen";
-import ChartPreviewScreen from "../screens/ChartPreviewScreen";
 import { colors } from "../constants/theme";
 
-const Stack = createStackNavigator();
-
 export default function RootNavigator() {
-  const { isAuthenticated, loading, hasProfile } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
@@ -25,23 +20,7 @@ export default function RootNavigator() {
     return <AuthNavigator />;
   }
 
-  // Authenticated but no birth profile yet
-  if (!hasProfile) {
-    return (
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen
-          name="BirthProfileInput"
-          component={BirthProfileInputScreen}
-        />
-        <Stack.Screen
-          name="ChartPreview"
-          component={ChartPreviewScreen}
-        />
-      </Stack.Navigator>
-    );
-  }
-
-  // Authenticated with profile → main app
+  // Authenticated → go directly to main app (ChartViewScreen)
   return <AppNavigator />;
 }
 

@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { TextInput, Button, Text, HelperText } from "react-native-paper";
 import DateTimePicker, {
@@ -182,55 +183,120 @@ export default function BirthProfileInputScreen({ navigation }: Props) {
           </View>
 
           {/* Date of Birth */}
-          <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-            <TextInput
-              label="Date of Birth"
-              value={birthDate ? formatDate(birthDate) : ""}
-              placeholder="Select date"
-              mode="outlined"
-              style={styles.input}
-              outlineColor={colors.border}
-              activeOutlineColor={colors.primary}
-              textColor={colors.text}
-              editable={false}
-              pointerEvents="none"
-              right={<TextInput.Icon icon="calendar" />}
-            />
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={birthDate ?? new Date(2000, 0, 1)}
-              mode="date"
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              onChange={onDateChange}
-              maximumDate={new Date()}
-            />
+          {Platform.OS === "web" ? (
+            <View>
+              <Text style={styles.fieldLabel}>Date of Birth</Text>
+              {/* @ts-ignore - web input element */}
+              <input
+                type="date"
+                value={birthDate ? formatDate(birthDate) : ""}
+                onChange={(e: any) => {
+                  const date = parseDateString(e.target.value);
+                  if (date) setBirthDate(date);
+                }}
+                max={formatDate(new Date())}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "4px",
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  fontSize: "14px",
+                  fontFamily: "inherit",
+                }}
+              />
+            </View>
+          ) : (
+            <>
+              <View style={styles.pickerWrapper}>
+                <Pressable
+                  onPress={() => setShowDatePicker(true)}
+                  style={styles.pickerPressable}
+                >
+                  <TextInput
+                    label="Date of Birth"
+                    value={birthDate ? formatDate(birthDate) : ""}
+                    placeholder="Select date"
+                    mode="outlined"
+                    style={styles.input}
+                    outlineColor={colors.border}
+                    activeOutlineColor={colors.primary}
+                    textColor={colors.text}
+                    editable={false}
+                    pointerEvents="none"
+                    right={<TextInput.Icon icon="calendar" />}
+                  />
+                </Pressable>
+              </View>
+              {showDatePicker && (
+                <DateTimePicker
+                  value={birthDate ?? new Date(2000, 0, 1)}
+                  mode="date"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  onChange={onDateChange}
+                  maximumDate={new Date()}
+                />
+              )}
+            </>
           )}
 
           {/* Time of Birth */}
-          <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-            <TextInput
-              label="Exact Time of Birth"
-              value={birthTime ? formatTime(birthTime) : ""}
-              placeholder="Select time (HH:MM)"
-              mode="outlined"
-              style={styles.input}
-              outlineColor={colors.border}
-              activeOutlineColor={colors.primary}
-              textColor={colors.text}
-              editable={false}
-              pointerEvents="none"
-              right={<TextInput.Icon icon="clock-outline" />}
-            />
-          </TouchableOpacity>
-          {showTimePicker && (
-            <DateTimePicker
-              value={birthTime ?? new Date()}
-              mode="time"
-              display={Platform.OS === "ios" ? "spinner" : "default"}
-              onChange={onTimeChange}
-              is24Hour={true}
-            />
+          {Platform.OS === "web" ? (
+            <View>
+              <Text style={styles.fieldLabel}>Exact Time of Birth</Text>
+              {/* @ts-ignore - web input element */}
+              <input
+                type="time"
+                value={birthTime ? formatTime(birthTime) : ""}
+                onChange={(e: any) => {
+                  const time = parseTimeString(e.target.value);
+                  if (time) setBirthTime(time);
+                }}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "4px",
+                  border: `1px solid ${colors.border}`,
+                  backgroundColor: colors.surface,
+                  color: colors.text,
+                  fontSize: "14px",
+                  fontFamily: "inherit",
+                }}
+              />
+            </View>
+          ) : (
+            <>
+              <View style={styles.pickerWrapper}>
+                <Pressable
+                  onPress={() => setShowTimePicker(true)}
+                  style={styles.pickerPressable}
+                >
+                  <TextInput
+                    label="Exact Time of Birth"
+                    value={birthTime ? formatTime(birthTime) : ""}
+                    placeholder="Select time (HH:MM)"
+                    mode="outlined"
+                    style={styles.input}
+                    outlineColor={colors.border}
+                    activeOutlineColor={colors.primary}
+                    textColor={colors.text}
+                    editable={false}
+                    pointerEvents="none"
+                    right={<TextInput.Icon icon="clock-outline" />}
+                  />
+                </Pressable>
+              </View>
+              {showTimePicker && (
+                <DateTimePicker
+                  value={birthTime ?? new Date()}
+                  mode="time"
+                  display={Platform.OS === "ios" ? "spinner" : "default"}
+                  onChange={onTimeChange}
+                  is24Hour={true}
+                />
+              )}
+            </>
           )}
 
           {/* Place of Birth */}
@@ -296,6 +362,12 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: colors.surface,
+  },
+  pickerWrapper: {
+    position: "relative",
+  },
+  pickerPressable: {
+    width: "100%",
   },
   fieldLabel: {
     fontSize: 13,

@@ -30,11 +30,30 @@ export default function ChartViewScreen() {
 
   useEffect(() => {
     (async () => {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/1a821131-c13f-410e-9d5e-7fdce8be9550',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChartViewScreen.tsx:31',message:'Starting chart load',data:{timestamp:Date.now()},timestamp:Date.now(),runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       try {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/1a821131-c13f-410e-9d5e-7fdce8be9550',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChartViewScreen.tsx:34',message:'Before getChart API call',data:{timestamp:Date.now()},timestamp:Date.now(),runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
         const data = await getChart();
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/1a821131-c13f-410e-9d5e-7fdce8be9550',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ChartViewScreen.tsx:37',message:'getChart succeeded',data:{hasData:!!data,hasChartData:!!data?.chart_data,hasPlanets:!!data?.chart_data?.planets,planetsCount:data?.chart_data?.planets?.length||0,timestamp:Date.now()},timestamp:Date.now(),runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        // #endregion
         setChart(data);
-      } catch {
-        setError("Could not load birth chart.");
+      } catch (err: any) {
+        // #region agent log
+        const errorLog = {location:'ChartViewScreen.tsx:41',message:'getChart failed',data:{errorMessage:err?.message,errorStatus:err?.response?.status,errorStatusText:err?.response?.statusText,errorData:err?.response?.data,hasResponse:!!err?.response,isNetworkError:!err?.response,timestamp:Date.now()},timestamp:Date.now(),runId:'run1',hypothesisId:'A'};
+        console.error('[DEBUG] Chart load error:', errorLog);
+        fetch('http://127.0.0.1:7243/ingest/1a821131-c13f-410e-9d5e-7fdce8be9550',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(errorLog)}).catch(()=>{});
+        // #endregion
+        const errorMsg = err?.response?.status 
+          ? `Could not load birth chart. Status: ${err.response.status} ${err.response.statusText || ''}`
+          : err?.message 
+          ? `Could not load birth chart. ${err.message}`
+          : "Could not load birth chart.";
+        setError(errorMsg);
       } finally {
         setLoading(false);
       }

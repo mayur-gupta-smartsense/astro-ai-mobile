@@ -1,4 +1,5 @@
 import React from "react";
+import { TouchableOpacity } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,15 +9,26 @@ import ProfileScreen from "../screens/ProfileScreen";
 import ChartViewScreen from "../screens/ChartViewScreen";
 import BirthProfileInputScreen from "../screens/BirthProfileInputScreen";
 import { colors } from "../constants/theme";
+import { useAuth } from "../context/AuthContext";
 
 const ChatStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+function SignOutButton() {
+  const { logout } = useAuth();
+  return (
+    <TouchableOpacity onPress={logout} style={{ marginRight: 16 }}>
+      <Ionicons name="log-out-outline" size={24} color={colors.text} />
+    </TouchableOpacity>
+  );
+}
+
 const stackScreenOptions = {
   headerStyle: { backgroundColor: colors.surface, elevation: 0, shadowOpacity: 0 },
   headerTintColor: colors.text,
   cardStyle: { backgroundColor: colors.background },
+  headerRight: () => <SignOutButton />,
 };
 
 function ChatStackNavigator() {
@@ -61,6 +73,7 @@ function ProfileStackNavigator() {
 export default function AppNavigator() {
   return (
     <Tab.Navigator
+      initialRouteName="ChartTab"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarStyle: {
@@ -78,6 +91,16 @@ export default function AppNavigator() {
       })}
     >
       <Tab.Screen
+        name="ProfileTab"
+        component={ProfileStackNavigator}
+        options={{ tabBarLabel: "Profile" }}
+      />
+      <Tab.Screen
+        name="ChatTab"
+        component={ChatStackNavigator}
+        options={{ tabBarLabel: "Chat" }}
+      />
+      <Tab.Screen
         name="ChartTab"
         component={ChartViewScreen}
         options={{
@@ -86,17 +109,8 @@ export default function AppNavigator() {
           headerShown: true,
           headerStyle: { backgroundColor: colors.surface, elevation: 0, shadowOpacity: 0 },
           headerTintColor: colors.text,
+          headerRight: () => <SignOutButton />,
         }}
-      />
-      <Tab.Screen
-        name="ChatTab"
-        component={ChatStackNavigator}
-        options={{ tabBarLabel: "Chat" }}
-      />
-      <Tab.Screen
-        name="ProfileTab"
-        component={ProfileStackNavigator}
-        options={{ tabBarLabel: "Profile" }}
       />
     </Tab.Navigator>
   );
