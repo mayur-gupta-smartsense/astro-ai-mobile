@@ -7,7 +7,7 @@ import { Platform } from "react-native";
 // Only use localhost for web development mode
 const BASE_URL = (Platform.OS === 'web' && typeof __DEV__ !== 'undefined' && __DEV__)
   ? "http://localhost:8000"
-  : "http://65.2.140.123:8000";
+  : "https://astroai.duckdns.org";
 
 console.log('[DEBUG] API Configuration:', {
   __DEV__: typeof __DEV__ !== 'undefined' ? __DEV__ : 'undefined',
